@@ -82,7 +82,7 @@ function getSettings() {
     numberCount: clamp(Number.parseInt(els.numberCount.value, 10) || 10, 2, 500),
     displaySeconds: clamp(snapHalfSecond(Number.parseFloat(els.displaySeconds.value) || 1), 0.5, 10),
     digitCount: clamp(Number.parseInt(els.digitCount.value, 10) || 1, 1, 5),
-    fontSize: clamp(Number.parseInt(els.fontSize.value, 10) || 160, 64, 260),
+    fontSize: clamp(Number.parseInt(els.fontSize.value, 10) || 160, 64, 400),
     autoStartSeconds: clamp(Number.parseInt(els.autoStartSeconds.value, 10) || 0, 0, 3600),
     showProgress: els.showProgress.checked,
     soundEnabled: els.soundEnabled.checked,
@@ -456,6 +456,10 @@ els.answerForm.addEventListener('submit', (event) => {
   submitAnswerFromShortcut();
 });
 
+els.answerInput.addEventListener('keydown', (event) => {
+  if (event.key === ',') event.preventDefault();
+});
+
 els.configBtn.addEventListener('click', returnToConfig);
 els.repeatBtn.addEventListener('click', () => startTraining({ repeat: true }));
 els.newBtn.addEventListener('click', () => startTraining({ repeat: false }));
@@ -540,9 +544,14 @@ document.addEventListener('keydown', (event) => {
     return;
   }
 
-  if (currentScreen === 'answer' && action === 'startConfirm') {
-    event.preventDefault();
-    submitAnswerFromShortcut();
+  if (currentScreen === 'answer') {
+    if (action === 'startConfirm') {
+      event.preventDefault();
+      submitAnswerFromShortcut();
+    } else if (action === 'repeatTraining') {
+      event.preventDefault();
+      startTraining({ repeat: true });
+    }
     return;
   }
 
