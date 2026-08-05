@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>Anzan — Treinamento Mental</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section id="configScreen" class="screen active" aria-labelledby="configTitle">
+      <div class="panel hero-panel">
+        <div>
+          <p class="eyebrow">CONFIGURAÇÃO</p>
+          <h2 id="configTitle">Prepare sua rodada</h2>
+          <p class="muted">Os ajustes e atalhos ficam salvos automaticamente neste navegador.</p>
+        </div>
+
+        <form id="configForm" class="config-grid">
+          <label class="field">
+            <span>Modo</span>
+            <select id="operationMode">
+              <option value="addition">Apenas soma</option>
+              <option value="mixed">Soma + subtração</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Quantidade de números</span>
+            <input id="numberCount" type="number" min="2" max="500" step="1" value="10" required />
+          </label>
+
+          <label class="field">
+            <span>Tempo por número</span>
+            <div class="range-row time-range-row">
+              <input id="displaySeconds" type="range" min="0.5" max="10" step="0.5" value="1" />
+              <output id="displaySecondsOutput" for="displaySeconds">1,00 s</output>
+            </div>
+            <small>A barra avança de 0,50 em 0,50 segundo.</small>
+          </label>
+
+          <label class="field">
+            <span>Tamanho dos valores</span>
+            <select id="digitCount">
+              <option value="1">1 dígito (1–9)</option>
+              <option value="2">2 dígitos (10–99)</option>
+              <option value="3">3 dígitos (100–999)</option>
+              <option value="4">4 dígitos (1000–9999)</option>
+              <option value="5">5 dígitos (10000–99999)</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Tamanho visual do número</span>
+            <div class="range-row">
+              <input id="fontSize" type="range" min="64" max="260" step="4" value="160" />
+              <output id="fontSizeOutput" for="fontSize">160 px</output>
+            </div>
+          </label>
+
+          <label class="field">
+            <span>Novo treino automático após</span>
+            <div class="input-suffix">
+              <input id="autoStartSeconds" type="number" min="0" max="3600" step="1" value="10" required />
+              <span>s</span>
+            </div>
+            <small>Use 0 para desativar.</small>
+          </label>
+
+          <label class="field checkbox-field">
+            <input id="showProgress" type="checkbox" checked />
+            <span>Mostrar progresso durante a rodada</span>
+          </label>
+
+          <label class="field checkbox-field">
+            <input id="soundEnabled" type="checkbox" checked />
+            <span>Tocar beep em cada número</span>
+          </label>
+
+          <button id="soundTestBtn" class="small-button sound-test-button" type="button">Testar beep</button>
+
+          <button class="primary-button start-button" type="submit">
+            Iniciar treino <kbd id="startShortcutKbd">Enter</kbd>
+          </button>
+        </form>
+      </div>
+
+      <div class="panel shortcuts-panel">
+        <div class="shortcuts-heading">
+          <div>
+            <h3>Atalhos configuráveis</h3>
+            <p class="muted shortcut-help">Clique em um atalho e pressione a nova tecla.</p>
+          </div>
+          <button id="resetShortcutsBtn" class="small-button" type="button">Restaurar padrões</button>
+        </div>
+
+        <div class="shortcut-editor">
+          <button class="shortcut-capture" type="button" data-shortcut-action="startConfirm">
+            <span>Iniciar / confirmar</span><kbd>Enter</kbd>
+          </button>
+          <button class="shortcut-capture" type="button" data-shortcut-action="newTraining">
+            <span>Novo treino</span><kbd>N</kbd>
+          </button>
+          <button class="shortcut-capture" type="button" data-shortcut-action="repeatTraining">
+            <span>Repetir sequência</span><kbd>R</kbd>
+          </button>
+          <button class="shortcut-capture" type="button" data-shortcut-action="openConfig">
+            <span>Configurações</span><kbd>C</kbd>
+          </button>
+          <button class="shortcut-capture" type="button" data-shortcut-action="testSound">
+            <span>Testar beep</span><kbd>B</kbd>
+          </button>
+          <button class="shortcut-capture" type="button" data-shortcut-action="cancelTraining">
+            <span>Cancelar rodada</span><kbd>Esc</kbd>
+          </button>
+        </div>
+        <p id="shortcutStatus" class="shortcut-status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section id="trainingScreen" class="screen training-screen" aria-live="polite">
+      <div class="training-topline">
+        <span id="modeBadge" class="badge">Apenas soma</span>
+        <span id="progressText" class="progress-text">1 / 10</span>
+      </div>
+
+      <div class="number-stage">
+        <div id="currentNumber" class="current-number">0</div>
+      </div>
+
+      <p class="training-hint">Acompanhe mentalmente. <kbd id="cancelShortcutKbd">Esc</kbd> volta às configurações.</p>
+    </section>
+
+    <section id="answerScreen" class="screen answer-screen" aria-labelledby="answerTitle">
+      <div class="panel answer-panel">
+        <p class="eyebrow">RESULTADO FINAL</p>
+        <h2 id="answerTitle">Qual foi o total?</h2>
+        <form id="answerForm" class="answer-form">
+          <input id="answerInput" type="number" inputmode="numeric" autocomplete="off" placeholder="Digite o resultado" required />
+          <button class="primary-button" type="submit">Confirmar <kbd id="confirmShortcutKbd">Enter</kbd></button>
+        </form>
+      </div>
+    </section>
+
+    <section id="resultScreen" class="screen result-screen" aria-live="polite">
+      <div id="resultCard" class="panel result-card">
+        <div id="resultIcon" class="result-icon">✓</div>
+        <p id="resultLabel" class="eyebrow">RESPOSTA CORRETA</p>
+        <h2 id="resultTitle">Você acertou!</h2>
+        <p id="resultComparison" class="result-comparison"></p>
+
+        <details class="sequence-details">
+          <summary>Ver números da rodada</summary>
+          <div id="sequenceList" class="sequence-list"></div>
+        </details>
+
+        <div class="action-grid">
+          <button id="configBtn" class="secondary-button" type="button">Configurações <kbd id="configShortcutKbd">C</kbd></button>
+          <button id="repeatBtn" class="secondary-button" type="button">Repetir sequência <kbd id="repeatShortcutKbd">R</kbd></button>
+          <button id="newBtn" class="primary-button" type="button">Novo treino <kbd id="newShortcutKbd">N</kbd></button>
+        </div>
+
+        <p id="autoStartMessage" class="auto-start-message"></p>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
