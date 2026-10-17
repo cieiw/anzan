@@ -7,7 +7,8 @@ const DEFAULT_SHORTCUTS = Object.freeze({
   repeatTraining: 'KeyR',
   openConfig: 'KeyC',
   testSound: 'KeyB',
-  cancelTraining: 'Escape'
+  cancelTraining: 'Escape',
+  previousNumber: 'ArrowLeft'
 });
 
 const screens = {
@@ -51,6 +52,7 @@ const els = {
   startShortcutKbd: document.getElementById('startShortcutKbd'),
   confirmShortcutKbd: document.getElementById('confirmShortcutKbd'),
   cancelShortcutKbd: document.getElementById('cancelShortcutKbd'),
+  previousShortcutKbd: document.getElementById('previousShortcutKbd'),
   configShortcutKbd: document.getElementById('configShortcutKbd'),
   repeatShortcutKbd: document.getElementById('repeatShortcutKbd'),
   newShortcutKbd: document.getElementById('newShortcutKbd')
@@ -198,6 +200,7 @@ function updateShortcutUI() {
   els.startShortcutKbd.textContent = startLabel;
   els.confirmShortcutKbd.textContent = startLabel;
   els.cancelShortcutKbd.textContent = cancelLabel;
+  els.previousShortcutKbd.textContent = humanizeKeyCode(shortcuts.previousNumber);
   els.configShortcutKbd.textContent = humanizeKeyCode(shortcuts.openConfig);
   els.repeatShortcutKbd.textContent = humanizeKeyCode(shortcuts.repeatTraining);
   els.newShortcutKbd.textContent = humanizeKeyCode(shortcuts.newTraining);
@@ -364,6 +367,16 @@ function displayNextNumber(runId) {
   displayTimer = window.setTimeout(() => {
     if (runId === trainingRunId && currentScreen === 'training') nextAction();
   }, settings.displaySeconds * 1000);
+}
+
+function displayPreviousNumber() {
+  // sequenceIndex points to the next number, after the one currently visible.
+  if (currentScreen !== 'training' || sequenceIndex <= 1) return;
+
+  clearTimers();
+  trainingRunId += 1;
+  sequenceIndex -= 2;
+  displayNextNumber(trainingRunId);
 }
 
 function showAnswerScreen() {
@@ -556,7 +569,10 @@ document.addEventListener('keydown', (event) => {
   }
 
   if (currentScreen === 'training') {
-    if (action === 'newTraining') {
+    if (action === 'previousNumber') {
+      event.preventDefault();
+      displayPreviousNumber();
+    } else if (action === 'newTraining') {
       event.preventDefault();
       startTraining({ repeat: false });
     } else if (action === 'repeatTraining') {
