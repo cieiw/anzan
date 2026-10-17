@@ -8,7 +8,8 @@ const DEFAULT_SHORTCUTS = Object.freeze({
   openConfig: 'KeyC',
   testSound: 'KeyB',
   cancelTraining: 'Escape',
-  previousNumber: 'ArrowLeft'
+  previousNumber: 'ArrowLeft',
+  nextNumber: 'ArrowRight'
 });
 
 const screens = {
@@ -53,6 +54,7 @@ const els = {
   confirmShortcutKbd: document.getElementById('confirmShortcutKbd'),
   cancelShortcutKbd: document.getElementById('cancelShortcutKbd'),
   previousShortcutKbd: document.getElementById('previousShortcutKbd'),
+  nextShortcutKbd: document.getElementById('nextShortcutKbd'),
   configShortcutKbd: document.getElementById('configShortcutKbd'),
   repeatShortcutKbd: document.getElementById('repeatShortcutKbd'),
   newShortcutKbd: document.getElementById('newShortcutKbd')
@@ -201,6 +203,7 @@ function updateShortcutUI() {
   els.confirmShortcutKbd.textContent = startLabel;
   els.cancelShortcutKbd.textContent = cancelLabel;
   els.previousShortcutKbd.textContent = humanizeKeyCode(shortcuts.previousNumber);
+  els.nextShortcutKbd.textContent = humanizeKeyCode(shortcuts.nextNumber);
   els.configShortcutKbd.textContent = humanizeKeyCode(shortcuts.openConfig);
   els.repeatShortcutKbd.textContent = humanizeKeyCode(shortcuts.repeatTraining);
   els.newShortcutKbd.textContent = humanizeKeyCode(shortcuts.newTraining);
@@ -377,6 +380,18 @@ function displayPreviousNumber() {
   trainingRunId += 1;
   sequenceIndex -= 2;
   displayNextNumber(trainingRunId);
+}
+
+function advanceNumber() {
+  if (currentScreen !== 'training') return;
+
+  clearTimers();
+  trainingRunId += 1;
+  if (sequenceIndex >= sequence.length) {
+    showAnswerScreen();
+  } else {
+    displayNextNumber(trainingRunId);
+  }
 }
 
 function showAnswerScreen() {
@@ -572,6 +587,9 @@ document.addEventListener('keydown', (event) => {
     if (action === 'previousNumber') {
       event.preventDefault();
       displayPreviousNumber();
+    } else if (action === 'nextNumber') {
+      event.preventDefault();
+      advanceNumber();
     } else if (action === 'newTraining') {
       event.preventDefault();
       startTraining({ repeat: false });
